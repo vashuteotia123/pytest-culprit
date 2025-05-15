@@ -19,7 +19,7 @@ def run_cmd(cmd: List[str], capture_output=False) -> subprocess.CompletedProcess
 
 def get_last_n_commits(n: int) -> List[str]:
     result = run_cmd(["git", "rev-list", "--max-count", str(n), "HEAD"], capture_output=True)
-    return result.stdout.strip().split("\n")
+    return result.stdout.strip().split("\n")[::-1]  # Reverse to go oldest → newest
 
 
 def checkout_commit(commit: str):
@@ -56,23 +56,28 @@ def main():
         print("❌ No commits found.")
         return
 
-    last_failing_commit = None
+    low = 0
+    high = len(commits) - 1
+    first_passing_index = None
 
-    for idx, commit in enumerate(commits):
+    while low <= high:
+        mid = (low + high) // 2
+        commit = commits[mid]
         checkout_commit(commit)
-        print(f"▶️  Running test at commit {commit} [{idx+1}/{len(commits)}]")
+        print(f"▶️  Running test at commit {commit} [{mid+1}/{len(commits)}]")
 
         if test_passes(args.test_cmd):
-            if last_failing_commit:
-                print("\n🚨 Test started passing here.")
-                print("❌ Last failing commit was:")
-                print(get_commit_full_info(last_failing_commit))
-                print(f"\n🧪 This commit broke: {' '.join(args.test_cmd)}")
-            else:
-                print("✅ Test passed for all checked commits.")
-            break
+            first_passing_index = mid
+            high = mid - 1
         else:
-            last_failing_commit = commit
+            low = mid + 1
+
+    if first_passing_index is not None:
+        print("\n✅ Test started passing here.")
+        if first_passing_index > 0:
+            print("❌ Last failing commit was:\n")
+            print(get_commit_full_info(commits[first_passing_index - 1]))
+        print(f"\n🧪 This commit broke: {' '.join(args.test_cmd)}")
     else:
         print(f"❌ Test failed for all {args.n} commits.")
 
@@ -82,3 +87,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
