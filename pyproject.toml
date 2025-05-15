@@ -1,0 +1,16 @@
+[project]
+name = "pytest-culprit"
+version = "0.1.0"
+description = "Find the last Git commit where a pytest test started failing"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [{name = "Vishal Teotia", email = "vashuteotia123@gmail.com"}]
+dependencies = []
+
+[project.scripts]
+pytest-culprit = "pytest_culprit.cli:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
