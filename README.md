@@ -24,6 +24,10 @@ pytest-culprit 15 pytest tests/test_rewards.py::test_logic
 - Stops when the test passes
 - Prints details of the last failing commit (the culprit)
 
+The walk is linear on purpose — it reports the **most recent** commit that broke the
+test, which stays correct even for a test that has broken, been fixed, and broken again.
+See [Design Notes](docs/README.md#why-not-binary-search) for why binary search isn't used.
+
 ## 📌 Example Output
 
 ```
