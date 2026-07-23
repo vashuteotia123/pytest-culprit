@@ -27,7 +27,7 @@ def checkout_commit(commit: str):
     run_cmd(["git", "checkout", commit], capture_output=True)
 
 
-def test_passes(test_cmd: List[str]) -> bool:
+def run_test(test_cmd: List[str]) -> bool:
     result = run_cmd(test_cmd, capture_output=True)
     return result.returncode == 0
 
@@ -62,7 +62,7 @@ def main():
         checkout_commit(commit)
         print(f"▶️  Running test at commit {commit} [{idx+1}/{len(commits)}]")
 
-        if test_passes(args.test_cmd):
+        if run_test(args.test_cmd):
             if last_failing_commit:
                 print("\n🚨 Test started passing here.")
                 print("❌ Last failing commit was:")
